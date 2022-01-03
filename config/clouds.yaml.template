@@ -1,0 +1,10 @@
+clouds:
+  csgo-server:
+    auth:
+      auth_url: https://keystone.sd6.api.gandi.net:5000/v3
+      identity_api_version: 3
+      project_name: <your gandi organization name>
+      user_domain_name: public
+      project_domain_name: public
+      username: <your gandi username>
+      password: <your gandi password :/ >
