@@ -9,6 +9,8 @@ if [ -z ${IP} ]; then
   exit 1
 fi
 
-scp host/* root@${IP}:/root/
+set -ev
 
-ssh root@${IP} "/root/install-host.sh"
+scp -p host/* debian@${IP}:/home/debian/
+
+ssh debian@${IP} "/home/debian/install-host.sh"

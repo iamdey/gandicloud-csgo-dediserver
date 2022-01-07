@@ -4,7 +4,7 @@ set -e
 
 FLAVOR="1069bcb0-c1e0-40cd-abb9-b1bad020ddcb" # V-R2
 IMAGE="1b82f155-164e-433c-b7aa-b8b351a3409a" # Debian 11 Bullseye
-VOLUME_SIZE=5 # Size in GB
+VOLUME_SIZE=50 # Size in GB (csgo server files: 30Go - 2022-01-06)
 HOSTNAME="CSGO-server"
 
 echo "Gandi vm creation"
@@ -42,9 +42,13 @@ echo ""
 echo "  Server creation"
 echo ""
 
-openstack server create --flavor ${FLAVOR} --image ${IMAGE} --boot-from-volume ${VOLUME_SIZE} --network public --key-name ${SSH_PUB_KEY_NAME} ${HOSTNAME}
+set -v
+
+openstack server create --flavor ${FLAVOR} --image ${IMAGE} --boot-from-volume ${VOLUME_SIZE} --network public --key-name "${SSH_PUB_KEY_NAME}" ${HOSTNAME}
 
 openstack server list
+
+set +v
 
 echo ""
 echo "  Wait for your server to be active."
