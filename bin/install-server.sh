@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-if [ -f .env ]; then
-  export $(cat .env | sed 's/#.*//g' | xargs)
-fi
+set -o allexport
+[[ -f .env ]] && source .env
+set +o allexport
 
 if [ -z ${IP} ]; then
   echo "  IP of the server not set. Please install it and fill it in .env"
