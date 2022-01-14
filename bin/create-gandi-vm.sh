@@ -5,6 +5,8 @@ set -e
 FLAVOR="1069bcb0-c1e0-40cd-abb9-b1bad020ddcb" # V-R2
 IMAGE="1b82f155-164e-433c-b7aa-b8b351a3409a" # Debian 11 Bullseye
 VOLUME_SIZE=50 # Size in GB (csgo server files: 30Go - 2022-01-06)
+
+# TODO: refactor in .env or config
 HOSTNAME="CSGO-server"
 
 echo "Gandi vm creation"
@@ -24,6 +26,8 @@ if [ ! command -v openstack &> /dev/null ]; then
     echo "install using pip: `pip3 install openstackclient` cf. https://docs.gandi.net/fr/vps/vps_api/index.html"
     exit 1
 fi
+
+source bin/read-config.sh
 
 echo "  [pre-requisite] openstack configuration check"
 if [ -z ${OS_PASSWORD+x} ]; then

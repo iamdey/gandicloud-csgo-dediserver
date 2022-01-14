@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 set -o allexport
-[[ -f .env ]] && source .env
+[[ -f bin/.env.host ]] && source .env
 set +o allexport
 
 if [ -z ${IP} ]; then

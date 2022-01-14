@@ -1,1 +1,4 @@
-.env
+config/.env.main
+config/api.json
+config/host.json
+config/token

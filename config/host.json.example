@@ -1,0 +1,8 @@
+{
+  "hostname": "CSGO-server",
+  "ip": "<ip of the server when you have it>",
+  "gslt": "<create gslt to allow to connect game server: http://steamcommunity.com/dev/managegameservers>",
+  "port": <server port, default: 27015>,
+  "rcon": "<rcon password>",
+  "pass": "<server password>"
+}

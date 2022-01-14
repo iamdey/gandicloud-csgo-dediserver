@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 set -o allexport
-[[ -f .env ]] && source .env
+[[ -f config/.env.main ]] && source .env
 set +o allexport
 
 echo 'Please enter your GOStack Password: (same password as your gandi v5 account) '
