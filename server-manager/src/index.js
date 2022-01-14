@@ -34,6 +34,8 @@ async function readConfig() {
 
 async function main() {
   const config = await readConfig();
+  // ---
+  // middlewares
   // @ts-ignore
   app.use(helmet());
   app.use(bodyParser.json());
@@ -49,6 +51,13 @@ async function main() {
 
   app.use(authorization);
 
+  app.use(
+    express.static(path.resolve(__dirname, '../../server-manager-client/build'))
+  );
+  // ---
+
+  // ---
+  // API
   async function getHostState() {
     try {
       await exec(`ping ${config.host.ip} -c 1 -W 10`);
@@ -93,9 +102,7 @@ async function main() {
     }
   });
 
-  app.get('/', (req, res) => {
-    res.send('Hello World!');
-  });
+  // ---
 
   app.listen(config.api.api_port, () => {
     console.log(
