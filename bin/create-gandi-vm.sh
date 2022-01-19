@@ -43,6 +43,15 @@ echo ""
 openstack image list
 
 echo ""
+echo "  Token creation"
+echo ""
+
+TOKEN_ID=$(openstack token issue | grep -owP 'id.*\|\s\K.*[^\|]+')
+
+
+echo  $TOKEN_ID > config/token
+
+echo ""
 echo "  Server creation"
 echo ""
 
