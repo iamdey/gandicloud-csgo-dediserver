@@ -6,6 +6,7 @@ const util = require('util');
 const express = require('express');
 const helmet = require('helmet');
 const bodyParser = require('body-parser');
+const { Router } = require('express');
 const exec = util.promisify(require('child_process').exec);
 
 const app = express();
@@ -16,13 +17,13 @@ const app = express();
  */
 async function readConfig() {
   const apiBuf = await fs.readFile(
-    path.resolve(__dirname, '..', 'config', 'api.json')
+    path.resolve(__dirname, '../../config/api.json')
   );
   const hostBuf = await fs.readFile(
-    path.resolve(__dirname, '..', 'config', 'host.json')
+    path.resolve(__dirname, '../../config/host.json')
   );
   const tokenBuf = await fs.readFile(
-    path.resolve(__dirname, '..', 'config', 'token')
+    path.resolve(__dirname, '../../config/token')
   );
 
   return {
@@ -32,13 +33,13 @@ async function readConfig() {
   };
 }
 
-async function main() {
-  const config = await readConfig();
-  // ---
-  // middlewares
-  // @ts-ignore
-  app.use(helmet());
-  app.use(bodyParser.json());
+/**
+ *
+ * @param {Config} config
+ * @returns {Router}
+ */
+function api(config) {
+  const apiRouter = Router();
 
   function authorization(req, res, next) {
     const bearer = req.get('Bearer');
@@ -49,12 +50,7 @@ async function main() {
     res.status(403).send('Unauthorized');
   }
 
-  app.use(authorization);
-
-  app.use(
-    express.static(path.resolve(__dirname, '../../server-manager-client/build'))
-  );
-  // ---
+  apiRouter.use(authorization);
 
   // ---
   // API
@@ -68,12 +64,12 @@ async function main() {
     }
   }
 
-  app.get('/host/state', async (req, res) => {
+  apiRouter.get('/host/state', async (req, res) => {
     const state = await getHostState();
     return res.json({ state });
   });
 
-  app.post('/host/state', async (req, res) => {
+  apiRouter.post('/host/state', async (req, res) => {
     const { action } = req.body;
     if (!['boot', 'shutdown'].includes(action)) {
       return res.status(400).json({ err: `Unknown action "${action}"` });
@@ -100,9 +96,41 @@ async function main() {
       console.error(err.toString());
       return res.status(500).send('Unable to change host state');
     }
+
+    return { message: 'OK' };
   });
 
+  // game status
+  // openstack server sudo su -c "/home/csgoserver/csgoserver dt" csgoserver
+
   // ---
+
+  return apiRouter;
+}
+
+async function main() {
+  const config = await readConfig();
+  // ---
+  // middlewares
+  app.use(bodyParser.json());
+
+  // logger
+  app.use((req, res, next) => {
+    console.log(
+      `Req: ${req.method} ${req.path}`,
+      req.method.toLocaleLowerCase() === 'post' ? req.body : ''
+    );
+    next();
+  });
+  // @ts-ignore
+  app.use(helmet());
+
+  app.use(
+    express.static(path.resolve(__dirname, '../../server-manager-client/build'))
+  );
+  // ---
+
+  app.use('/api', api(config));
 
   app.listen(config.api.api_port, () => {
     console.log(

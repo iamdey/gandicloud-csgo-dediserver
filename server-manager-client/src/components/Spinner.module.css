@@ -1,0 +1,10 @@
+.spinner {
+  animation: spin8 1s steps(18) infinite;
+  display: inline-block;
+}
+
+@keyframes spin8 {
+  to {
+    transform: rotateZ(360deg);
+  }
+}

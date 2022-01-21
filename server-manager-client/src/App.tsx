@@ -1,12 +1,24 @@
-import React from 'react';
-import { ThemeProvider } from 'emotion-theming';
 import preset from '@rebass/preset-material';
+import { ThemeProvider } from 'emotion-theming';
+import * as React from 'react';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { Box } from 'rebass';
 import Header from './layout/Header';
 import Home from './scenes/Home';
-import { Box } from 'rebass';
+import './styles.css';
 
 const theme = {
   ...preset,
+  buttons: {
+    ...preset.buttons,
+    primary: {
+      ...preset.buttons.primary,
+      ':disabled': {
+        bg: 'muted',
+        color: 'text',
+      },
+    },
+  },
   styles: {
     ...preset.styles,
     root: {
@@ -19,13 +31,17 @@ const theme = {
   },
 };
 
+const queryClient = new QueryClient();
+
 function App() {
   return (
     <ThemeProvider theme={theme}>
-      <Box variant="styles.root">
-        <Header />
-        <Home />
-      </Box>
+      <QueryClientProvider client={queryClient}>
+        <Box variant="styles.root">
+          <Header />
+          <Home />
+        </Box>
+      </QueryClientProvider>
     </ThemeProvider>
   );
 }
