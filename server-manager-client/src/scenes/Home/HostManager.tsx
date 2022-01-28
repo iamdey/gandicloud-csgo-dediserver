@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useMutation, useQuery } from 'react-query';
 import { Box, Button } from 'rebass';
 import Spinner from '../../components/Spinner';
-import GameServerManager from './GameServerManeger';
+// import GameServerManager from './GameServerManeger';
 
 interface HostState {
   state: 'alive' | 'offline';

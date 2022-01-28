@@ -12,7 +12,7 @@ const exec = util.promisify(require('child_process').exec);
 const app = express();
 
 /**
- * @typedef {{ api: { api_port: number, api_token: string }, host: { hostname: string, ip: string, gslt: ?string, port: number, rcon: ?string, pass: ?string}, os_token: string }} Config
+ * @typedef {{ api: { api_port: number, api_token: string }, host: { hostname: string, ip: string, gslt: ?string, port: number, rcon: ?string, pass: ?string}, os_token: string, svm_client: { severName: string } }} Config
  * @returns {Promise<Config>}
  */
 async function readConfig() {
@@ -25,11 +25,15 @@ async function readConfig() {
   const tokenBuf = await fs.readFile(
     path.resolve(__dirname, '../../config/token')
   );
+  const svmClientBuf = await fs.readFile(
+    path.resolve(__dirname, '../../config/svm-client.json')
+  );
 
   return {
     api: JSON.parse(apiBuf.toString()),
     host: JSON.parse(hostBuf.toString()),
     os_token: tokenBuf.toString(),
+    svm_client: JSON.parse(svmClientBuf.toString()),
   };
 }
 
@@ -41,19 +45,13 @@ async function readConfig() {
 function api(config) {
   const apiRouter = Router();
 
-  function authorization(req, res, next) {
-    const bearer = req.get('Bearer');
-    if (bearer === config.api.api_token) {
-      return next();
-    }
-
-    res.status(403).send('Unauthorized');
-  }
-
-  apiRouter.use(authorization);
-
   // ---
   // API
+
+  apiRouter.get('/config', (req, res) => {
+    return res.json(config.svm_client);
+  });
+
   async function getHostState() {
     try {
       await exec(`ping ${config.host.ip} -c 1 -W 10`);
