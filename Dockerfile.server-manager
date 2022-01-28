@@ -1,0 +1,38 @@
+FROM node:lts-alpine as server-manager-client
+
+WORKDIR /server-manager-client
+COPY server-manager-client/package.json ./
+COPY server-manager-client/yarn.lock ./
+RUN corepack enable
+RUN yarn install
+COPY server-manager-client/tsconfig.json ./
+COPY server-manager-client/src ./src/
+COPY server-manager-client/public ./public/
+
+RUN yarn build
+
+
+FROM debian:bullseye-slim as server-manager
+
+RUN apt update && apt upgrade -y
+RUN apt install -y curl
+RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
+RUN apt install -y nodejs
+RUN apt install -y python3 python3-pip
+RUN pip install python-openstackclient
+
+WORKDIR /config
+COPY config/ .
+
+WORKDIR /server-manager-client
+COPY --from=server-manager-client /server-manager-client/build ./build/
+
+WORKDIR /server-manager
+COPY server-manager/package.json ./
+COPY server-manager/yarn.lock ./
+RUN corepack enable
+RUN yarn install
+COPY server-manager/src ./src/
+
+EXPOSE 3000
+CMD ["yarn", "start"]

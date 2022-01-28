@@ -1,0 +1,7 @@
+localhost:443 {
+	reverse_proxy backend:3000
+
+	basicauth {
+		{$SVM_USERNAME:admin} {$SVM_PASSWORD}
+	}
+}
