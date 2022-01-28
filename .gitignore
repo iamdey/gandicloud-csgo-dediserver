@@ -1,4 +1,3 @@
-config/.env.main
-config/api.json
-config/host.json
+config/*.env
+config/*.json
 config/token
