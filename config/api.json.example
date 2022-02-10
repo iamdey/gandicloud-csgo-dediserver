@@ -1,4 +1,3 @@
 {
-  "api_token": "<secret token>",
   "api_port": 3000
 }

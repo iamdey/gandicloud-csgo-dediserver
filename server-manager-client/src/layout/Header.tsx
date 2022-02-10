@@ -1,19 +1,11 @@
 import * as React from 'react';
 import { useQuery } from 'react-query';
 import { Heading } from 'rebass';
-
-interface Config {
-  serverName: string;
-}
+import { getConfig } from '../service/config/query';
+import { ConfigPayload } from '../service/config/types';
 
 export default function Header() {
-  const { data: config } = useQuery<Config>('config', async () => {
-    const response = await fetch('/api/config');
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    return response.json();
-  });
+  const { data: config } = useQuery<ConfigPayload>('config', getConfig);
   return (
     <header>
       <Heading as="h1" mb={4}>

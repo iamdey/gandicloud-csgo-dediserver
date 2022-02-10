@@ -8,6 +8,7 @@ const helmet = require('helmet');
 const bodyParser = require('body-parser');
 const { Router } = require('express');
 const exec = util.promisify(require('child_process').exec);
+const dotenv = require('dotenv');
 
 const app = express();
 
@@ -47,9 +48,16 @@ function api(config) {
 
   // ---
   // API
-
   apiRouter.get('/config', (req, res) => {
-    return res.json(config.svm_client);
+    return res.json({
+      ...config.svm_client,
+      ip: config.host.ip,
+      game: {
+        rcon: config.host.rcon,
+        pass: config.host.pass,
+        port: config.host.port,
+      },
+    });
   });
 
   async function getHostState() {
@@ -91,11 +99,10 @@ function api(config) {
         `openstack server ${mapOpenstackCmd[action]} ${config.host.hostname}`
       );
     } catch (err) {
-      console.error(err.toString());
       return res.status(500).send('Unable to change host state');
     }
 
-    return { message: 'OK' };
+    return res.json({ message: 'OK' });
   });
 
   // game status
@@ -107,6 +114,10 @@ function api(config) {
 }
 
 async function main() {
+  dotenv.config({
+    path: path.resolve(__dirname, '../../config/openstack.env'),
+  });
+
   const config = await readConfig();
   // ---
   // middlewares

@@ -2,7 +2,9 @@ import * as React from 'react';
 import { useMutation, useQuery } from 'react-query';
 import { Box, Button } from 'rebass';
 import Spinner from '../../components/Spinner';
-// import GameServerManager from './GameServerManeger';
+import { getConfig } from '../../service/config/query';
+import { ConfigPayload } from '../../service/config/types';
+import GameServerManager from './GameServerManager';
 
 interface HostState {
   state: 'alive' | 'offline';
@@ -33,13 +35,20 @@ type ChangingState = 'none' | 'starting' | 'stoping';
 export default function HostManager() {
   const [changingState, setChangingState] =
     React.useState<ChangingState>('none');
-  const { data: hostState } = useQuery<HostState>('hostState', async () => {
-    const response = await fetch('/api/host/state');
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
+  const { data: config } = useQuery<ConfigPayload>('config', getConfig);
+  const { data: hostState } = useQuery<HostState>(
+    'hostState',
+    async () => {
+      const response = await fetch('/api/host/state');
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    },
+    {
+      refetchInterval: 1000,
     }
-    return response.json();
-  });
+  );
 
   const { mutateAsync: mutate } = useMutation<
     { message: 'OK' },
@@ -109,8 +118,11 @@ export default function HostManager() {
             {getButtonText({ hostState })}
           </Button>
         </Box>
+        <p style={{ fontStyle: 'italic' }}>{config?.ip}</p>
       </Box>
-      {/* <GameServerManager /> */}
+      {config && hostState?.state === 'alive' && (
+        <GameServerManager config={config} />
+      )}
     </div>
   );
 }
